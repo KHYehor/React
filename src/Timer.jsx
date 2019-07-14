@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Button, Grid } from '@material-ui/core';
 import ms from 'pretty-ms';
+import './Timer.css';
 
 export default class Timer extends Component {
   constructor(props) {
@@ -10,12 +11,14 @@ export default class Timer extends Component {
       start: 0,
       isOn: false,
       isPaused: false,
+      laps: []
     };
     this.timer = null;
     this.handleStart = this.handleStart.bind(this);
     this.handleStop = this.handleStop.bind(this);
     this.handlePause = this.handlePause.bind(this);
     this.handleResume = this.handleResume.bind(this);
+    this.handleLap = this.handleLap.bind(this);
   }
 
   handleStart() {
@@ -28,7 +31,7 @@ export default class Timer extends Component {
   }
 
   handleStop() {
-    this.setState({ time: 0.0, isOn: false, isPaused: false });
+    this.setState({ time: 0.0, isOn: false, isPaused: false, laps: []});
     clearInterval(this.timer);
   }
 
@@ -42,16 +45,24 @@ export default class Timer extends Component {
     this.handleStart();
   }
 
-  componentDidMount() { }
-
-  componentDidUpdate() { 
-    console.log(this.state);
+  handleLap() {
+    this.setState(prevState => {
+      const { time, laps } = prevState;
+      laps.push(<li key={laps.length}>{ms(time)}</li>);
+      return { laps };
+    });
+    console.log(this.state.laps);
+    console.log(...this.state.laps);
   }
+
+  componentDidMount() {}
+
+  componentDidUpdate() {}
 
   render() {
     const defProps = { variant: "contained", color: "primary" };
     return (
-      <Fragment>
+      <div className="App">
         <h1>This is quite simple timer</h1>
         <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
           <Grid item xs={12}>
@@ -60,14 +71,18 @@ export default class Timer extends Component {
           <Grid item>
             <Button { ...defProps } disabled={ !this.state.isOn ? true : false } onClick={ this.handleStop }>Stop</Button>
             <Button { ...defProps } disabled={ !this.state.isOn ? true : false } onClick={ this.handlePause }>Pause</Button>
+            <Button { ...defProps } disabled={ !this.state.isOn ? true : false } onClick={ this.handleLap }>Lap</Button>
           </Grid>
           <Grid item item xs={12}>
             <Button { ...defProps } disabled={ !this.state.isPaused ? true : false } onClick={ this.handleResume }>Resume</Button>
           </Grid>
         </Grid>
         <h4>{ms(this.state.time)}</h4>
-      </Fragment> 
+        <h4 style={!this.state.laps.length ? {display: 'none'} : null}>Saved time</h4>
+        <ul style={!this.state.laps.length ? {display: 'none'} : null}>
+          {this.state.laps}
+        </ul>
+      </div> 
     );
   }
 }
-
