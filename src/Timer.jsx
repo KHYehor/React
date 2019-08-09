@@ -11,17 +11,14 @@ export default class Timer extends Component {
       start: 0,
       isOn: false,
       isPaused: false,
-      laps: []
+      laps: [],
+      loaded: false,
+      text: ''
     };
     this.timer = null;
-    this.handleStart = this.handleStart.bind(this);
-    this.handleStop = this.handleStop.bind(this);
-    this.handlePause = this.handlePause.bind(this);
-    this.handleResume = this.handleResume.bind(this);
-    this.handleLap = this.handleLap.bind(this);
   }
 
-  handleStart() {
+  handleStart = event => {
     this.setState({ isOn: true, isPaused: false, start: Date.now() - this.state.time });
     this.timer = setInterval(() => {
       this.setState((prevState, props) => {
@@ -30,59 +27,68 @@ export default class Timer extends Component {
     }, 1);
   }
 
-  handleStop() {
+  handleStop = event => {
     this.setState({ time: 0.0, isOn: false, isPaused: false, laps: []});
     clearInterval(this.timer);
   }
 
-  handlePause() {
+  handlePause = event => {
     this.setState({ isOn: false, isPaused: true });
     clearInterval(this.timer);
   }
 
-  handleResume() {
+  handleResume = event => {
     this.setState({ isOn: true, isPaused: false });
     this.handleStart();
   }
 
-  handleLap() {
+  handleLap = event => {
     this.setState(prevState => {
       const { time, laps } = prevState;
       laps.push(<li key={laps.length}>{ms(time)}</li>);
       return { laps };
     });
-    console.log(this.state.laps);
-    console.log(...this.state.laps);
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.setState({ loaded: true });
+  }
 
   componentDidUpdate() {}
 
   render() {
     const defProps = { variant: "contained", color: "primary" };
-    return (
-      <div className="App">
-        <h1>This is quite simple timer</h1>
-        <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
-          <Grid item xs={12}>
-            <Button { ...defProps } disabled={ (this.state.isOn || this.state.isPaused) ? true : false } onClick={ this.handleStart }>Start</Button>
+    if (!this.state.loaded) {
+      return (
+        <div>
+          Loading...
+        </div>
+      );
+    } else {
+      return (
+        <div className="App">
+          <h1>This is quite simple timer</h1>
+          <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
+            <Grid item xs={12}>
+              <Button { ...defProps } disabled={ (this.state.isOn || this.state.isPaused) ? true : false } onClick={ this.handleStart }>Start</Button>
+            </Grid>
+            <Grid item>
+              <Button { ...defProps } disabled={ !this.state.isOn ? true : false } onClick={ this.handleStop }>Stop</Button>
+              <Button { ...defProps } disabled={ !this.state.isOn ? true : false } onClick={ this.handlePause }>Pause</Button>
+              <Button { ...defProps } disabled={ !this.state.isOn ? true : false } onClick={ this.handleLap }>Lap</Button>
+            </Grid>
+            <Grid item item xs={12}>
+              <Button { ...defProps } disabled={ !this.state.isPaused ? true : false } onClick={ this.handleResume }>Resume</Button>
+            </Grid>
           </Grid>
-          <Grid item>
-            <Button { ...defProps } disabled={ !this.state.isOn ? true : false } onClick={ this.handleStop }>Stop</Button>
-            <Button { ...defProps } disabled={ !this.state.isOn ? true : false } onClick={ this.handlePause }>Pause</Button>
-            <Button { ...defProps } disabled={ !this.state.isOn ? true : false } onClick={ this.handleLap }>Lap</Button>
-          </Grid>
-          <Grid item item xs={12}>
-            <Button { ...defProps } disabled={ !this.state.isPaused ? true : false } onClick={ this.handleResume }>Resume</Button>
-          </Grid>
-        </Grid>
-        <h4>{ms(this.state.time)}</h4>
-        <h4 style={!this.state.laps.length ? {display: 'none'} : null}>Saved time</h4>
-        <ul style={!this.state.laps.length ? {display: 'none'} : null}>
-          {this.state.laps}
-        </ul>
-      </div> 
-    );
+          <h4>{ms(this.state.time)}</h4>
+          <h4 style={!this.state.laps.length ? {display: 'none'} : null}>Saved time</h4>
+          <ul style={!this.state.laps.length ? {display: 'none'} : null}>
+            {this.state.laps}
+          </ul>
+          <input type="text" value={this.state.text} onChange={e => this.setState({ text: e.target.value })}/>
+        </div> 
+      ); 
+    }
   }
 }
