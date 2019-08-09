@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { Button, Grid } from '@material-ui/core';
 import ms from 'pretty-ms';
 import './Timer.css';
@@ -13,7 +13,6 @@ export default class Timer extends Component {
       isPaused: false,
       laps: [],
       loaded: false,
-      text: ''
     };
     this.timer = null;
   }
@@ -77,7 +76,7 @@ export default class Timer extends Component {
               <Button { ...defProps } disabled={ !this.state.isOn ? true : false } onClick={ this.handlePause }>Pause</Button>
               <Button { ...defProps } disabled={ !this.state.isOn ? true : false } onClick={ this.handleLap }>Lap</Button>
             </Grid>
-            <Grid item item xs={12}>
+            <Grid item xs={12}>
               <Button { ...defProps } disabled={ !this.state.isPaused ? true : false } onClick={ this.handleResume }>Resume</Button>
             </Grid>
           </Grid>
@@ -86,7 +85,6 @@ export default class Timer extends Component {
           <ul style={!this.state.laps.length ? {display: 'none'} : null}>
             {this.state.laps}
           </ul>
-          <input type="text" value={this.state.text} onChange={e => this.setState({ text: e.target.value })}/>
         </div> 
       ); 
     }
